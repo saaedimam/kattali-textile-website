@@ -1,0 +1,540 @@
+ROLE
+You are a senior release engineer working inside my Replit workspace. Make the project production‑ready as a static site under /public with mobile PWA features and an in‑browser visual editor. Be precise and deterministic.
+
+PROJECT SETTINGS
+- Site root: /public
+- Entry: /public/index.html
+- Styles: /public/styles/main.css
+- Scripts: /public/scripts/*.js
+- Media: /public/video/fabric-waves.mp4 (already uploaded), poster /public/img/fabric-waves.jpg
+- Icons: /public/logo/icon-180.png, icon-192.png, icon-512.png
+- Visual editor (GrapesJS) at /public/edit.html (locked by key)
+- PWA service worker: /public/sw.js
+- Manifest: /public/manifest.json
+- SPA: hash routing; do NOT break existing router
+- Cleanup: remove root /index.html, /index.js, /build.js, /scripts (root-level)
+
+DELIVERABLES
+1) Final tree (only files we keep)
+2) Full file contents for everything created/modified
+3) Shell commands to apply changes in Replit
+4) Quick verification checklist (mobile + PWA + video + editor)
+
+ACTIONS
+
+A) FINAL TREE
+KT LBD/
+├─ public/
+│  ├─ index.html
+│  ├─ manifest.json
+│  ├─ sw.js
+│  ├─ edit.html
+│  ├─ img/
+│  │  └─ fabric-waves.jpg        # poster (provide a simple 1920x1080 placeholder if missing)
+│  ├─ logo/
+│  │  ├─ icon-180.png
+│  │  ├─ icon-192.png
+│  │  └─ icon-512.png
+│  ├─ video/
+│  │  └─ fabric-waves.mp4        # already present
+│  ├─ scripts/
+│  │  ├─ config.js               # (existing)
+│  │  ├─ router.js               # (existing)
+│  │  ├─ main.js                 # (existing; we’ll append overrides injector)
+│  │  ├─ stocks.js               # (existing if used)
+│  │  ├─ mobile.js               # (new)
+│  │  └─ editor.js               # (new)
+│  └─ styles/
+│     └─ main.css
+├─ README.md
+├─ .gitignore
+└─ (optional) package.json + server.js for local run (skip if not needed)
+
+B) WRITE FILES (FULL CONTENTS)
+
+===> /public/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Mobile + PWA -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0ea5a5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <title>KTL — Export-Ready Apparel Manufacturer | Bangladesh</title>
+  <meta name="description" content="Kattali Textile Ltd. — Built by Iori" />
+
+  <!-- Icons -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/logo/icon-180.png" />
+  <link rel="icon" sizes="192x192" href="/logo/icon-192.png" />
+  <link rel="icon" sizes="512x512" href="/logo/icon-512.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+  <!-- Full-bleed background video (mobile-safe) -->
+  <video id="bg-video" class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="/img/fabric-waves.jpg">
+    <source src="/video/fabric-waves.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Accessibility -->
+  <a class="skip-link" href="#app">Skip to content</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#/">
+        <span class="logo">KTL</span>
+        <span class="brand-text">Kattali Textile Ltd.</span>
+      </a>
+
+      <!-- Mobile menu toggle -->
+      <button class="stairs-toggle" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="stairs-bar" data-level="1"></span>
+        <span class="stairs-bar" data-level="2"></span>
+        <span class="stairs-bar" data-level="3"></span>
+      </button>
+
+      <!-- Nav -->
+      <nav class="stairs-nav" aria-label="Main navigation">
+        <div class="nav-backdrop" tabindex="-1" aria-hidden="true"></div>
+        <ul class="nav-list">
+          <li><a href="#/"               class="nav-link" data-level="1">Home</a></li>
+          <li><a href="#/about"          class="nav-link" data-level="1">About</a></li>
+          <li><a href="#/sustainability" class="nav-link" data-level="2">Sustainability</a></li>
+          <li><a href="#/certifications" class="nav-link" data-level="2">Certifications</a></li>
+          <li><a href="#/clients"        class="nav-link" data-level="1">Clients</a></li>
+          <li><a href="#/impact"         class="nav-link" data-level="3">Impact</a></li>
+          <li><a href="#/investors"      class="nav-link" data-level="2">Investors</a></li>
+          <li><a href="#/careers"        class="nav-link" data-level="1">Careers</a></li>
+          <li><a href="#/news"           class="nav-link" data-level="3">News</a></li>
+          <li><a href="#/contact"        class="nav-link" data-level="2">Contact</a></li>
+          <li><a href="#/rfq"            class="nav-link btn btn-rfq" data-level="3">Request Quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main id="app" class="view container" role="main" aria-live="polite"></main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; <span id="year"></span> Kattali Textile Ltd., Chattogram, Bangladesh — Built by Iori</p>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="#/privacy">Privacy</a>
+        <a href="#/terms">Terms</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script defer src="/scripts/config.js"></script>
+  <script defer src="/scripts/router.js"></script>
+  <script defer src="/scripts/main.js"></script>
+  <script defer src="/scripts/stocks.js"></script>
+  <script defer src="/scripts/mobile.js"></script>
+  <script>
+    // PWA registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+    }
+  </script>
+</body>
+</html>
+
+===> /public/styles/main.css
+/* ========== Root & base ========== */
+:root{
+  --brand:#0ea5a5;
+  --bg-overlay: rgba(0,0,0,.35);
+  --radius:12px;
+  --header-h:64px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color:#fff;
+  -webkit-tap-highlight-color: transparent;
+  background:#000;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Background video (mobile safe) */
+.bg-video{
+  position:fixed; inset:0; width:100svw; height:100svh; /* svh handles iOS toolbars */
+  object-fit:cover; z-index:-1; pointer-events:none; background:#000;
+}
+@media (prefers-reduced-motion: reduce){
+  .bg-video{display:none}
+}
+
+/* Optional overlay for readability */
+body::after{
+  content:""; position:fixed; inset:0; background:var(--bg-overlay); z-index:0; pointer-events:none;
+}
+
+/* Layout containers */
+.container{ width:min(100%, 1080px); margin-inline:auto; padding:0 16px }
+
+/* Header */
+.site-header{
+  position:sticky; top:0; z-index:10;
+  backdrop-filter: blur(10px);
+  background: rgba(0,0,0,.35);
+  height: var(--header-h);
+}
+.header-inner{
+  display:flex; align-items:center; justify-content:space-between; height:100%;
+}
+.brand{ display:flex; align-items:center; gap:.5rem; color:#fff; font-weight:700; letter-spacing:.2px }
+.logo{ display:inline-grid; place-items:center; width:36px; height:36px; border-radius:999px; background:#b01818; font-weight:800 }
+
+/* Mobile nav (hamburger) */
+.stairs-toggle{
+  appearance:none; border:0; background:transparent; width:44px; height:44px; border-radius:8px;
+  display:grid; place-content:center; cursor:pointer; color:#fff;
+}
+.stairs-bar{ display:block; width:22px; height:2px; background:#fff; margin:3px 0; border-radius:2px }
+
+/* Nav panel */
+.stairs-nav{
+  position:fixed; inset:0; translate:0 -100%;
+  background:rgba(10,10,10,.9);
+  transition: translate .3s ease;
+}
+.stairs-nav.open{ translate:0 0 }
+.nav-backdrop{ position:absolute; inset:0; }
+.nav-list{
+  position:relative; list-style:none; margin:calc(env(safe-area-inset-top) + 72px) 16px 16px; padding:0;
+  display:grid; gap:10px;
+}
+.nav-link{
+  display:block; width:100%; padding:14px 16px; border-radius:10px;
+  background:rgba(255,255,255,.08); color:#fff; font-size:16px;
+  touch-action:manipulation;
+}
+.btn{ background:var(--brand); color:#fff; border-radius:12px; font-weight:700; text-align:center }
+.btn:hover{ filter:brightness(1.08) }
+
+/* Desktop nav */
+@media (min-width: 900px){
+  .stairs-toggle{ display:none }
+  .stairs-nav{ position:static; translate:0 0; background:transparent }
+  .nav-list{ margin:0; display:flex; gap:10px; align-items:center }
+  .nav-link{ background:transparent; padding:10px 12px }
+  .btn{ padding:10px 14px }
+}
+
+/* Main & footer above overlays */
+#app, .site-header, .site-footer{ position:relative; z-index:1 }
+
+/* Footer */
+.site-footer{ background:rgba(0,0,0,.35); padding:16px 0; margin-top:24px; }
+
+/* Skip link */
+.skip-link{
+  position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;
+}
+.skip-link:focus{
+  left:16px; top:16px; width:auto; height:auto; background:#000; color:#fff; padding:8px 12px; border-radius:8px; z-index:9999;
+}
+
+/* Buttons on hero (example) */
+.btn-rfq{ padding:12px 16px; min-height:44px } /* 44px hit target */
+
+===> /public/scripts/mobile.js
+// Mobile nav open/close + small helpers
+(function () {
+  const toggle = document.querySelector('.stairs-toggle');
+  const nav = document.querySelector('.stairs-nav');
+  const backdrop = document.querySelector('.nav-backdrop');
+
+  function setOpen(open){
+    nav.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+  }
+
+  toggle?.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+  backdrop?.addEventListener('click', () => setOpen(false));
+
+  // Update year
+  const y = document.getElementById('year');
+  if (y) y.textContent = new Date().getFullYear();
+
+  // Respect reduced motion: pause bg video
+  const v = document.getElementById('bg-video');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) v?.pause();
+
+  // iOS resume after lock
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) v?.play().catch(()=>{});
+  });
+})();
+
+===> /public/scripts/editor.js
+// In-page visual editor (GrapesJS), saves to localStorage, exports HTML/CSS
+const STORAGE_HTML_KEY = 'ktl-site-html';
+const STORAGE_CSS_KEY  = 'ktl-site-css';
+
+async function loadCurrentSite() {
+  const res = await fetch('/index.html', { cache: 'no-store' });
+  const htmlText = await res.text();
+  const appMatch = htmlText.match(/<main[^>]*id="app"[^>]*>([\s\S]*?)<\/main>/i);
+  const seedHtml = appMatch ? appMatch[1].trim() : '<section class="hero"><h1>KTL</h1><p>Start editing…</p></section>';
+  return { html: seedHtml, css: '' };
+}
+
+(async function init() {
+  const { html: seedHtml, css: seedCss } = await loadCurrentSite();
+
+  const editor = grapesjs.init({
+    container: '#gjs',
+    height: '100%',
+    fromElement: false,
+    storageManager: false,
+    canvas: { styles: ['/styles/main.css'] },
+    plugins: [],
+    blockManager: { appendTo: null }
+  });
+
+  const savedHtml = localStorage.getItem(STORAGE_HTML_KEY);
+  const savedCss  = localStorage.getItem(STORAGE_CSS_KEY);
+  editor.setComponents(savedHtml || seedHtml);
+  editor.setStyle(savedCss || seedCss);
+
+  const bm = editor.BlockManager;
+  bm.add('hero', { label:'Hero', category:'KTL', content:`
+    <section class="hero container" style="padding:8svh 0;">
+      <h1 style="font-size:clamp(28px,6vw,56px);margin:0 0 12px;">Kattali Textile Ltd.</h1>
+      <p style="max-width:700px;margin:0 auto 20px;opacity:.9;">Export-Ready Apparel Manufacturer in Bangladesh</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="#/rfq" class="btn btn-rfq">Request Quote</a>
+        <a href="#/about" class="btn" style="background:#ffffff22;border:1px solid #ffffff33;">Learn More</a>
+      </div>
+    </section>` });
+
+  bm.add('two-col', { label:'Two Columns', category:'KTL', content:`
+    <section class="container" style="display:grid;gap:24px;grid-template-columns:1fr; padding:40px 0;">
+      <div>
+        <h2>About KTL</h2>
+        <p>KTL is a Bangladesh-based apparel manufacturer serving global brands with quality and speed.</p>
+      </div>
+      <div>
+        <img src="/img/fabric-waves.jpg" alt="Textile" style="width:100%;border-radius:12px;"/>
+      </div>
+    </section>` });
+
+  bm.add('cards-3', { label:'3 Feature Cards', category:'KTL', content:`
+    <section class="container" style="padding:40px 0;">
+      <h2 style="text-align:center;margin-bottom:12px;">What We Do</h2>
+      <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        <article style="background:#ffffff12;padding:16px;border-radius:12px;">
+          <h3>Knits</h3><p>Tees, polos, nightwear, loungewear</p>
+        </article>
+        <article style="background:#ffffff12;padding:16px;border-radius:12px;">
+          <h3>Woven</h3><p>Shirts, bottoms, uniforms</p>
+        </article>
+        <article style="background:#ffffff12;padding:16px;border-radius:12px;">
+          <h3>Quality & Compliance</h3><p>ISO, OEKO‑TEX, and customer audits</p>
+        </article>
+      </div>
+    </section>` });
+
+  bm.add('cta', { label:'CTA', category:'KTL', content:`
+    <section class="container" style="padding:56px 0;text-align:center;">
+      <h2>Ready to work with KTL?</h2>
+      <a href="#/rfq" class="btn btn-rfq" style="margin-top:12px;display:inline-block;">Request a Quote</a>
+    </section>` });
+
+  document.getElementById('btnSave').onclick = () => {
+    const html = editor.getHtml();
+    const css  = editor.getCss();
+    localStorage.setItem(STORAGE_HTML_KEY, html);
+    localStorage.setItem(STORAGE_CSS_KEY, css);
+    alert('Saved! Refresh the main site to preview.');
+  };
+
+  document.getElementById('btnExport').onclick = () => {
+    const html = editor.getHtml();
+    const css  = editor.getCss();
+    const files = [
+      { name: 'export.html', content: html },
+      { name: 'export.css',  content: css }
+    ];
+    files.forEach(file => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([file.content], { type: 'text/plain' }));
+      a.download = file.name;
+      a.click();
+    });
+  };
+
+  document.getElementById('btnClear').onclick = () => {
+    localStorage.removeItem(STORAGE_HTML_KEY);
+    localStorage.removeItem(STORAGE_CSS_KEY);
+    alert('Cleared overrides. Reload the editor.');
+  };
+
+  document.getElementById('btnLoadSite').onclick = async () => {
+    const site = await loadCurrentSite();
+    editor.setComponents(site.html);
+    editor.setStyle(site.css);
+  };
+})();
+
+===> /public/edit.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KTL Editor</title>
+  <link href="https://unpkg.com/grapesjs@0.21.8/dist/css/grapes.min.css" rel="stylesheet"/>
+  <style>
+    html,body { height:100%; margin:0; }
+    #gjs { height:100vh; }
+    .gjs-pn-panel { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    .toolbar { position: fixed; inset: 8px auto auto 8px; z-index: 9999; display: flex; gap: 8px; }
+    .toolbar button { padding: 8px 12px; border-radius: 8px; border: none; background: #0ea5a5; color: #fff; font-weight: 700; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <!-- Simple passcode gate -->
+  <script>
+    (function(){
+      const NEED_KEY = true;
+      const KEY = 'ktl2025'; // change this
+      const got = new URL(location.href).searchParams.get('key');
+      if (NEED_KEY && got !== KEY) {
+        document.write('<p style="font:16px/1.4 system-ui;padding:24px">Editor locked. Append <code>?key='+KEY+'</code> to the URL.</p>');
+        throw new Error('Locked');
+      }
+    })();
+  </script>
+
+  <div class="toolbar">
+    <button id="btnSave">Save</button>
+    <button id="btnExport">Export HTML/CSS</button>
+    <button id="btnClear">Clear Overrides</button>
+    <button id="btnLoadSite">Load Current Site</button>
+  </div>
+
+  <div id="gjs"></div>
+
+  <script src="https://unpkg.com/grapesjs@0.21.8/dist/grapes.min.js"></script>
+  <script src="/scripts/editor.js"></script>
+</body>
+</html>
+
+===> append to END of /public/scripts/main.js
+(function applyOverrides(){
+  const html = localStorage.getItem('ktl-site-html');
+  const css  = localStorage.getItem('ktl-site-css');
+  if (css) {
+    let tag = document.getElementById('ktl-custom-css');
+    if (!tag) {
+      tag = document.createElement('style');
+      tag.id = 'ktl-custom-css';
+      document.head.appendChild(tag);
+    }
+    tag.textContent = css;
+  }
+  if (html) {
+    const app = document.getElementById('app');
+    if (app) app.innerHTML = html;
+  }
+})();
+
+===> /public/manifest.json
+{
+  "name": "Kattali Textile Ltd.",
+  "short_name": "KTL",
+  "description": "Export-Ready Apparel Manufacturer — Built by Iori",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0ea5a5",
+  "icons": [
+    { "src": "/logo/icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/logo/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/logo/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
+
+===> /public/sw.js
+const VER = 'ktl-v1';
+const ASSETS = [
+  '/', '/index.html',
+  '/styles/main.css',
+  '/scripts/config.js','/scripts/router.js','/scripts/main.js','/scripts/stocks.js','/scripts/mobile.js',
+  '/video/fabric-waves.mp4',
+  '/img/fabric-waves.jpg',
+  '/logo/icon-180.png','/logo/icon-192.png','/logo/icon-512.png'
+];
+
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(VER).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== VER).map(k => caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  e.respondWith(
+    caches.match(req).then(cached => cached || fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(VER).then(c => c.put(req, copy));
+      return res;
+    }).catch(() => cached))
+  );
+});
+
+===> .gitignore
+node_modules/
+.env
+*.log
+.DS_Store
+dist/
+build/
+
+C) SHELL COMMANDS (RUN IN REPLIT SHELL)
+mkdir -p public/{img,logo,video,scripts,styles}
+# move partials if you had any at root:
+[ -d partials ] && mkdir -p public/partials && git mv partials/* public/partials/ 2>/dev/null || true
+# remove root duplicates/legacy:
+git rm -rf --cached index.html index.js build.js scripts 2>/dev/null || true
+rm -rf index.html index.js build.js scripts 2>/dev/null || true
+# (Place fabric-waves.mp4 in public/video/ and poster + icons as specified)
+# write files above (or paste via editor), then:
+git add -A
+git commit -m "Mobile PWA + global MP4 bg + visual editor; static-only /public"
+# If using GitHub remote:
+# git push
+
+D) VERIFICATION CHECKLIST
+- Video loads: DevTools → Network → /video/fabric-waves.mp4 = 200, type video/mp4.
+- iOS: video shows inline (muted + playsinline), safe areas respected (viewport-fit=cover, svh).
+- Reduced motion: enable in OS → video hides, layout OK.
+- Menu: tap hamburger → opens; backdrop tap closes; scroll locked when open.
+- PWA: visit site → Application → Manifest OK; SW registered; Add to Home Screen works; offline still loads.
+- Editor: open /edit?key=ktl2025 → drag blocks → Save; reload main site → overrides applied; Export creates files.
+
+OUTPUT FORMAT
+- Apply exactly the contents and structure above. Do not invent extra files or frameworks. Keep SPA hash routing intact. Ensure all script tags in index.html use defer and correct paths. 
+BEGIN.

@@ -1,0 +1,164 @@
+ROLE
+You are a senior full‑stack engineer and release manager. Your job is to make a static website production‑ready on Replit (and Vercel-compatible) with zero build steps. You will create/repair files, enforce a clean repo tree, wire a global background video, and run verification checks. Be concise but complete. Never leave TODOs or placeholders—use exact values below.
+
+PROJECT
+- Name: ktlbd-web20
+- Site root: /public
+- Entry file: /public/index.html
+- Styles: /public/styles/main.css
+- Scripts dir: /public/scripts
+- Media:
+  - Background video MP4: /public/video/fabric-waves.mp4 (already provided by user)
+  - Optional poster image (fallback): /public/img/fabric-waves.jpg (create a small blank if missing)
+- Hash router: yes (single-page, loads partials)
+- Remove legacy root files: /index.html, /index.js, /build.js, /scripts (root)
+- Keep only: everything under /public + README.md + .gitignore (+ optional server.js for local run)
+
+DELIVERABLES
+1) Final file tree (only the files that will remain) — show as a tree.
+2) Full file contents for any files you create or modify.
+3) Exact shell commands to apply changes on Replit (mkdir/mv/rm/git add/commit).
+4) Minimal Express server (optional) to run locally on Replit (node server.js). Include package.json.
+5) Static deployment notes (Vercel/any static host).
+6) Verification steps: network check, MIME types, iOS autoplay, z-index, reduced-motion, and SPA routing.
+7) Final go‑live checklist.
+
+ACTIONS
+A. Repo cleanup & structure
+- Ensure this exact structure (create missing; remove duplicates):
+  /public
+    /img
+    /logo
+    /video
+    /scripts
+      config.js
+      router.js
+      main.js
+      stocks.js
+    /styles
+      main.css
+    /partials   (if partials exist, put them here)
+    index.html
+  README.md
+  .gitignore
+  (optional) package.json
+  (optional) server.js
+
+- If /partials exists at repo root, move its contents into /public/partials and delete the root folder.
+- Delete root duplicates: /index.html, /index.js, /build.js, /scripts (root-level).
+
+B. Background video (global, all pages)
+- Insert once at the very top of <body> in /public/index.html:
+  <video id="bg-video" class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="/img/fabric-waves.jpg">
+    <source src="/video/fabric-waves.mp4" type="video/mp4" />
+  </video>
+
+- In /public/styles/main.css, add (or ensure) the following block exactly:
+  .bg-video{
+    position:fixed; inset:0; width:100vw; height:100vh;
+    object-fit:cover; z-index:-1; pointer-events:none;
+    background:#000;
+  }
+  /* optional readability overlay */
+  body::after{
+    content:""; position:fixed; inset:0;
+    background:rgba(0,0,0,.35); z-index:0; pointer-events:none;
+  }
+  /* app above video + overlay */
+  .site-header, .site-footer, #app { position:relative; z-index:1; }
+  /* accessibility: reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .bg-video { display:none; }
+    body::after { background:none; }
+  }
+
+- Ensure script order at the end of /public/index.html (defer):
+  <script defer src="scripts/config.js"></script>
+  <script defer src="scripts/router.js"></script>
+  <script defer src="scripts/main.js"></script>
+  <script defer src="scripts/stocks.js"></script>
+  (include news.js/api.js only if they are used; otherwise omit)
+
+C. Optional Replit local server (Node)
+- Create package.json with exact content:
+  {
+    "name": "ktlbd-web20",
+    "private": true,
+    "version": "1.0.0",
+    "scripts": { "start": "node server.js" }
+  }
+- Create server.js with exact content:
+  const express = require('express'), path = require('path');
+  const app = express();
+  app.use(express.static(path.join(__dirname,'public'), { maxAge: '1y', extensions:['html'] }));
+  app.get('*',(_,res)=>res.sendFile(path.join(__dirname,'public/index.html')));
+  app.listen(process.env.PORT||3000, ()=>console.log('http://localhost:3000'));
+
+D. README.md (concise)
+- Overwrite with:
+  Web20 — Kattali Textile Ltd. (KTL)
+  Static site served from /public. Global background video at /public/video/fabric-waves.mp4.
+  Local run: npm start (serves /public). Deploy to any static host (Vercel Output Directory: public). No build step.
+
+E. .gitignore
+- Ensure it contains exactly:
+  node_modules/
+  .env
+  *.log
+  .DS_Store
+  dist/
+  build/
+
+F. Commands to apply changes (run in Replit shell)
+- Move partials if present:
+  mkdir -p public/partials && [ -d partials ] && git mv partials/* public/partials/ 2>/dev/null || true
+- Remove root duplicates:
+  git rm -rf --cached index.html index.js build.js scripts 2>/dev/null || true
+  rm -rf index.html index.js build.js scripts 2>/dev/null || true
+- Ensure folders exist:
+  mkdir -p public/{img,logo,video,scripts,styles,partials}
+- Create files (if missing) with heredocs (index.html, main.css, package.json, server.js, README.md, .gitignore) using the exact contents you provided above.
+- Commit:
+  git add -A
+  git commit -m "Release: static-only /public site; global MP4 background; cleanup & deploy config"
+
+G. Verification (do all)
+1) Network: open DevTools → Network → refresh.
+   - /video/fabric-waves.mp4 must be 200 (not 404).
+   - Type should be video/mp4.
+2) iOS autoplay compliance:
+   - <video> has muted and playsinline. If still not visible on iPhone, re-encode MP4:
+     ffmpeg -i fabric-waves.mp4 -c:v libx264 -profile:v baseline -level 3.0 -pix_fmt yuv420p -movflags +faststart -an public/video/fabric-waves-ios.mp4
+     Update source to /video/fabric-waves-ios.mp4 and retest.
+3) Stacking context:
+   - Video z-index is -1, app containers have z-index 1. If your layout creates new stacking contexts (transform/filter/opacity), change video to z-index:0 and keep content at z-index:1.
+4) Reduced motion:
+   - Toggle prefers-reduced-motion in dev tools; video should hide without breaking layout.
+5) SPA routing:
+   - Navigate #/about, #/news, #/contact; video should continue playing and not reload.
+6) Performance:
+   - Keep MP4 < ~5–8 MB for quick load; add poster=/img/fabric-waves.jpg for first paint.
+7) Lighthouse quick pass (optional):
+   - Aim ≥90 for Performance/Best Practices/SEO; if text contrast fails, darken overlay to rgba(0,0,0,.45).
+
+H. Deploy notes (Vercel)
+- Framework Preset: Other
+- Output Directory: public
+- Build Command: (empty)
+- Install Command: (empty)
+- Root Directory: repo root (where /public lives)
+
+OUTPUT FORMAT
+- First: show the final file tree.
+- Then: print each full file content you created/modified (fenced).
+- Then: print the exact shell commands.
+- Then: print the verification checklist as bullet points.
+- Finally: print a short “Go‑Live Checklist”.
+
+CONSTRAINTS
+- Do not invent extra folders or tools. No build systems. No placeholders—use the exact paths and names above.
+- Ensure links in index.html use relative paths from /public (e.g., scripts/config.js → "scripts/config.js"; video → "/video/fabric-waves.mp4").
+- Keep script tags with defer and correct order.
+- Be deterministic and idempotent—re-running the commands should not break the project.
+
+BEGIN NOW.

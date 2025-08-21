@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KTL Editor</title>
+  <link href="https://unpkg.com/grapesjs@0.21.8/dist/css/grapes.min.css" rel="stylesheet"/>
+  <style>
+    html,body { height:100%; margin:0; }
+    #gjs { height:100vh; }
+    .gjs-pn-panel { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    .toolbar { position: fixed; inset: 8px auto auto 8px; z-index: 9999; display: flex; gap: 8px; }
+    .toolbar button { padding: 8px 12px; border-radius: 8px; border: none; background: #0ea5a5; color: #fff; font-weight: 700; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <!-- Simple passcode gate -->
+  <script>
+    (function(){
+      const NEED_KEY = true;
+      const KEY = 'ktl2025'; // change this
+      const got = new URL(location.href).searchParams.get('key');
+      if (NEED_KEY && got !== KEY) {
+        document.write('<p style="font:16px/1.4 system-ui;padding:24px">Editor locked. Append <code>?key='+KEY+'</code> to the URL.</p>');
+        throw new Error('Locked');
+      }
+    })();
+  </script>
+
+  <div class="toolbar">
+    <button id="btnSave">Save</button>
+    <button id="btnExport">Export HTML/CSS</button>
+    <button id="btnClear">Clear Overrides</button>
+    <button id="btnLoadSite">Load Current Site</button>
+  </div>
+
+  <div id="gjs"></div>
+
+  <script src="https://unpkg.com/grapesjs@0.21.8/dist/grapes.min.js"></script>
+  <script src="/scripts/editor.js"></script>
+</body>
+</html>

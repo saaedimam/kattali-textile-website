@@ -1,0 +1,67 @@
+<section class="container hero-section">
+  <h1>Request a Quote</h1>
+  <p>Get a competitive quote for your apparel manufacturing needs. We specialize in knits, woven garments, and custom production.</p>
+</section>
+
+<section class="container">
+  <div style="display:grid;gap:40px;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));padding:40px 0;">
+    <div>
+      <h2>Quote Request Form</h2>
+      <form style="margin-top:20px;">
+        <div style="margin-bottom:16px;">
+          <label for="company" style="display:block;margin-bottom:4px;">Company Name</label>
+          <input type="text" id="company" name="company" required style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label for="contact-name" style="display:block;margin-bottom:4px;">Contact Person</label>
+          <input type="text" id="contact-name" name="contact-name" required style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label for="email-rfq" style="display:block;margin-bottom:4px;">Email</label>
+          <input type="email" id="email-rfq" name="email" required style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label for="product-type" style="display:block;margin-bottom:4px;">Product Type</label>
+          <select id="product-type" name="product-type" required style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;">
+            <option value="">Select Product Type</option>
+            <option value="knits">Knits (T-shirts, Polos, Nightwear)</option>
+            <option value="woven">Woven (Shirts, Bottoms, Uniforms)</option>
+            <option value="custom">Custom Manufacturing</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label for="quantity" style="display:block;margin-bottom:4px;">Estimated Quantity</label>
+          <input type="number" id="quantity" name="quantity" required min="100" style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label for="details" style="display:block;margin-bottom:4px;">Product Details & Requirements</label>
+          <textarea id="details" name="details" rows="4" required style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;resize:vertical;" placeholder="Please include fabric type, sizes, colors, design details, timeline, etc."></textarea>
+        </div>
+        <button type="submit" class="btn btn-rfq">Submit Quote Request</button>
+      </form>
+    </div>
+    
+    <div>
+      <h2>Our Manufacturing Capabilities</h2>
+      <div style="margin-top:20px;">
+        <div style="background:rgba(255,255,255,0.1);padding:20px;border-radius:12px;margin-bottom:16px;">
+          <h3>Production Lines</h3>
+          <p>12 fully equipped production lines with modern machinery and IoT tracking systems.</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);padding:20px;border-radius:12px;margin-bottom:16px;">
+          <h3>Team</h3>
+          <p>850+ skilled team members with expertise in quality garment manufacturing.</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);padding:20px;border-radius:12px;margin-bottom:16px;">
+          <h3>Certifications</h3>
+          <p>ISO certified with OEKO-TEX compliance ensuring ethical and sustainable production.</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);padding:20px;border-radius:12px;">
+          <h3>Lead Times</h3>
+          <p>Competitive lead times with efficient production planning and global shipping capabilities.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
